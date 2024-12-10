@@ -1,0 +1,11 @@
+.App {
+  text-align: center;
+  height: 100vh;
+  background-color: #bde0fe;
+}
+
+.heading {
+  font-family: Delius;
+  font-size: 2.8em;
+  padding: 2vh 0;
+}
