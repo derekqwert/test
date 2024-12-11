@@ -1,13 +1,34 @@
-import './App.css';
-import ListTable from './components/ListTable';
+import React, { useContext } from "react";
+import { UserProvider, UserContext } from "./contexts/UserContext";
+import Login from "./components/Login";
+import Store from "./components/Store";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import "./App.css";
 
 function App() {
   return (
-    <div className="App">
-      <h2 className='heading'>Sagnik Store</h2>
-      <ListTable />
-    </div>
+    <UserProvider>
+      <Router>
+        <div className="App">
+          <Routes>
+            <Route path="/" element={<Login />} />
+            <Route path="/store" element={<ProtectedRoute><Store /></ProtectedRoute>} />
+          </Routes>
+        </div>
+      </Router>
+    </UserProvider>
   );
 }
 
+const ProtectedRoute = ({ children }) => {
+  const { username } = useContext(UserContext);
+
+  if (!username) {
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
+};
+
 export default App;
+

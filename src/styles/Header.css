@@ -1,0 +1,15 @@
+.header-container {
+    width: 100vw;
+    height: 7vh;
+    display: flex;
+    justify-content: space-between;
+    padding: 5vh 10vw;
+}
+
+.logout-btn {
+    height: 5vh;
+}
+
+.username {
+    font-size: 1.5em;
+}

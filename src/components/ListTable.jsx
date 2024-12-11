@@ -5,10 +5,13 @@ import { Button, Table } from "react-bootstrap";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ItemCount from "./ItemCount";
+import DeleteModal from "./DeleteModal";
 
 const ListTable = () => {
   const [storeData, setStoreData] = useState([]);
   const [itemCounts, setItemCounts] = useState({});
+  const [showModal, setShowModal] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
   useEffect(() => {
     displayData();
@@ -47,6 +50,27 @@ const ListTable = () => {
     }
   };
 
+  const handleShowModal = (product) => {
+    setSelectedProduct(product);
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedProduct(null);
+    setShowModal(false);
+  };
+
+  const handleDelete = () => {
+    if (selectedProduct) {
+      setStoreData(storeData.filter((product) => product.id !== selectedProduct.id));
+      toast.error(`Deleted "${selectedProduct.title}"`, {
+        position: "bottom-right",
+        autoClose: 3000,
+      });
+      handleCloseModal();
+    }
+  };
+
   return (
     <div className="container">
       <Table className="table" striped bordered hover>
@@ -58,6 +82,7 @@ const ListTable = () => {
             <th>Image</th>
             <th>Quantity</th>
             <th>Add to Cart</th>
+            <th>Delete</th>
           </tr>
         </thead>
         <tbody>
@@ -77,21 +102,34 @@ const ListTable = () => {
               </td>
               <td>
                 <ItemCount
-                  onCountChange={(count) => handleItemCountChange(product.id, count)}
+                  onCountChange={(count) =>
+                    handleItemCountChange(product.id, count)
+                  }
                 />
               </td>
               <td>
-                <Button
-                  variant="primary"
-                  onClick={() => addToCart(product)}
-                >
+                <Button variant="primary" onClick={() => addToCart(product)}>
                   Add
+                </Button>
+              </td>
+              <td>
+                <Button
+                  variant="danger"
+                  onClick={() => handleShowModal(product)}
+                >
+                  Delete
                 </Button>
               </td>
             </tr>
           ))}
         </tbody>
       </Table>
+      <DeleteModal
+        show={showModal}
+        handleClose={handleCloseModal}
+        handleDelete={handleDelete}
+        itemName={selectedProduct ? selectedProduct.title : ""}
+      />
       <ToastContainer />
     </div>
   );
