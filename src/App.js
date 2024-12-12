@@ -1,6 +1,7 @@
 import React, { useContext } from "react";
 import { UserProvider, UserContext } from "./contexts/UserContext";
 import Login from "./components/Login";
+import Register from "./components/Register";
 import Store from "./components/Store";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import "./App.css";
@@ -12,6 +13,7 @@ function App() {
         <div className="App">
           <Routes>
             <Route path="/" element={<Login />} />
+            <Route path="/register" element={<Register />} />
             <Route path="/store" element={<ProtectedRoute><Store /></ProtectedRoute>} />
           </Routes>
         </div>
@@ -31,4 +33,3 @@ const ProtectedRoute = ({ children }) => {
 };
 
 export default App;
-

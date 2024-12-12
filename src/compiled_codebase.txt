@@ -14,22 +14,41 @@
 --- End of D:\Proj\react-table\src\App.css --- 
  
 --- Start of D:\Proj\react-table\src\App.js --- 
-import './App.css';
-import Header from './components/Header';
-import ListTable from './components/ListTable';
+import React, { useContext } from "react";
+import { UserProvider, UserContext } from "./contexts/UserContext";
+import Login from "./components/Login";
+import Register from "./components/Register";
+import Store from "./components/Store";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import "./App.css";
 
 function App() {
   return (
-    <div className="App">
-      <Header />
-      <h2 className='heading'>Sagnik Store</h2>
-      <ListTable />
-    </div>
+    <UserProvider>
+      <Router>
+        <div className="App">
+          <Routes>
+            <Route path="/" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/store" element={<ProtectedRoute><Store /></ProtectedRoute>} />
+          </Routes>
+        </div>
+      </Router>
+    </UserProvider>
   );
 }
 
-export default App;
- 
+const ProtectedRoute = ({ children }) => {
+  const { username } = useContext(UserContext);
+
+  if (!username) {
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
+};
+
+export default App; 
 --- End of D:\Proj\react-table\src\App.js --- 
  
 --- Start of D:\Proj\react-table\src\compiled_codebase.txt --- 
@@ -49,22 +68,41 @@ export default App;
 --- End of D:\Proj\react-table\src\App.css --- 
  
 --- Start of D:\Proj\react-table\src\App.js --- 
-import './App.css';
-import Header from './components/Header';
-import ListTable from './components/ListTable';
+import React, { useContext } from "react";
+import { UserProvider, UserContext } from "./contexts/UserContext";
+import Login from "./components/Login";
+import Register from "./components/Register";
+import Store from "./components/Store";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import "./App.css";
 
 function App() {
   return (
-    <div className="App">
-      <Header />
-      <h2 className='heading'>Sagnik Store</h2>
-      <ListTable />
-    </div>
+    <UserProvider>
+      <Router>
+        <div className="App">
+          <Routes>
+            <Route path="/" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/store" element={<ProtectedRoute><Store /></ProtectedRoute>} />
+          </Routes>
+        </div>
+      </Router>
+    </UserProvider>
   );
 }
 
-export default App;
- 
+const ProtectedRoute = ({ children }) => {
+  const { username } = useContext(UserContext);
+
+  if (!username) {
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
+};
+
+export default App; 
 --- End of D:\Proj\react-table\src\App.js --- 
  
 --- Start of D:\Proj\react-table\src\compiled_codebase.txt --- 
@@ -78,12 +116,7 @@ export default App;
 
 .heading {
   font-family: Delius;
-  font-size: 2.8em;
-  padding: 2vh 0;
-} 
---- End of D:\Proj\react-table\src\App.css --- 
- 
---- Start of D:\Proj\react-table\src\App.js -- 
+  font-s 
 --- End of D:\Proj\react-table\src\compiled_codebase.txt --- 
  
 --- Start of D:\Proj\react-table\src\index.css --- 
@@ -180,20 +213,33 @@ export default DeleteModal;
 --- End of D:\Proj\react-table\src\components\DeleteModal.jsx --- 
  
 --- Start of D:\Proj\react-table\src\components\Header.jsx --- 
-import React from 'react'
-import "../styles/Header.css"
-import { Button } from 'react-bootstrap'
+import React, { useContext } from "react";
+import { UserContext } from "../contexts/UserContext";
+import "../styles/Header.css";
+import { Button } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 
 const Header = () => {
-  return (
-    <div className='header-container'>
-        <span className='username'>username : </span>
-        <Button className='logout-btn' variant='danger'>Log Out</Button>
-    </div>
-  )
-}
+  const { username, setUsername } = useContext(UserContext);
+  const navigate = useNavigate();
 
-export default Header 
+  const handleLogout = () => {
+    setUsername("");
+    navigate("/");
+  };
+
+  return (
+    <div className="header-container">
+      <span className="username">username: {username}</span>
+      <Button className="logout-btn" variant="danger" onClick={handleLogout}>
+        Log Out
+      </Button>
+    </div>
+  );
+};
+
+export default Header;
+ 
 --- End of D:\Proj\react-table\src\components\Header.jsx --- 
  
 --- Start of D:\Proj\react-table\src\components\ItemCount.jsx --- 
@@ -382,13 +428,159 @@ export default ListTable;
  
 --- End of D:\Proj\react-table\src\components\ListTable.jsx --- 
  
+--- Start of D:\Proj\react-table\src\components\Login.jsx --- 
+import React, { useContext, useState } from "react";
+import { UserContext } from "../contexts/UserContext";
+import "../styles/Login.css";
+import { useNavigate } from "react-router-dom";
+
+const Login = () => {
+  const { setUsername } = useContext(UserContext);
+  const [inputUsername, setInputUsername] = useState("");
+  const [inputPassword, setInputPassword] = useState("");
+  const navigate = useNavigate();
+
+  const handleLogin = () => {
+    const storedUser = localStorage.getItem("username");
+    const storedPass = localStorage.getItem("password");
+
+    if (inputUsername === storedUser && inputPassword === storedPass) {
+      setUsername(inputUsername);
+      navigate("/store");
+    } else {
+      alert("Invalid username or password.");
+    }
+  };
+
+  return (
+    <div className="login-container">
+      <h2 className="heading">Login</h2>
+      <input
+        type="text"
+        placeholder="Enter your username"
+        value={inputUsername}
+        onChange={(e) => setInputUsername(e.target.value)}
+        className="username-input"
+      />
+      <input
+        type="password"
+        placeholder="Enter your password"
+        value={inputPassword}
+        onChange={(e) => setInputPassword(e.target.value)}
+        className="password-input"
+      />
+      <button onClick={handleLogin} className="login-button">
+        Login
+      </button>
+    </div>
+  );
+};
+
+export default Login;
+ 
+--- End of D:\Proj\react-table\src\components\Login.jsx --- 
+ 
+--- Start of D:\Proj\react-table\src\components\Register.jsx --- 
+import React, { useState } from "react";
+import "../styles/Register.css";
+import { useNavigate } from "react-router-dom";
+
+const Register = () => {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const navigate = useNavigate();
+
+  const handleRegister = () => {
+    if (password !== confirmPassword) {
+      alert("Passwords do not match.");
+      return;
+    }
+
+    localStorage.setItem("username", username);
+    localStorage.setItem("password", password);
+    alert("Registration successful! Please login.");
+    navigate("/");
+  };
+
+  return (
+    <div className="register-container">
+      <h2 className="heading">Register</h2>
+      <input
+        type="text"
+        placeholder="Enter a username"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+        className="username-input"
+      />
+      <input
+        type="password"
+        placeholder="Enter a password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        className="password-input"
+      />
+      <input
+        type="password"
+        placeholder="Confirm your password"
+        value={confirmPassword}
+        onChange={(e) => setConfirmPassword(e.target.value)}
+        className="confirm-password-input"
+      />
+      <button onClick={handleRegister} className="register-button">
+        Register
+      </button>
+    </div>
+  );
+};
+
+export default Register;
+ 
+--- End of D:\Proj\react-table\src\components\Register.jsx --- 
+ 
+--- Start of D:\Proj\react-table\src\components\Store.jsx --- 
+import React from "react";
+import Header from "./Header";
+import ListTable from "./ListTable";
+
+const Store = () => {
+  return (
+    <div>
+      <Header />
+      <h2 className='heading'>Sagnik Store</h2>
+      <ListTable />
+    </div>
+  );
+};
+
+export default Store;
+ 
+--- End of D:\Proj\react-table\src\components\Store.jsx --- 
+ 
+--- Start of D:\Proj\react-table\src\contexts\UserContext.js --- 
+import React, { createContext, useState } from "react";
+
+export const UserContext = createContext();
+
+export const UserProvider = ({ children }) => {
+  const [username, setUsername] = useState("");
+
+  return (
+    <UserContext.Provider value={{ username, setUsername }}>
+      {children}
+    </UserContext.Provider>
+  );
+};
+ 
+--- End of D:\Proj\react-table\src\contexts\UserContext.js --- 
+ 
 --- Start of D:\Proj\react-table\src\styles\Header.css --- 
 .header-container {
     width: 100vw;
     height: 7vh;
     display: flex;
     justify-content: space-between;
-    padding: 3vh 10vw;
+    padding: 5vh 10vw;
 }
 
 .logout-btn {
@@ -428,4 +620,74 @@ export default ListTable;
 }
  
 --- End of D:\Proj\react-table\src\styles\ListTable.css --- 
+ 
+--- Start of D:\Proj\react-table\src\styles\Login.css --- 
+.login-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #bde0fe;
+}
+
+.username-input {
+  margin: 1rem 0;
+  padding: 0.5rem;
+  font-size: 1.2rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.login-button {
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  background-color: #2196e4;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.login-button:hover {
+  background-color: #1769aa;
+}
+ 
+--- End of D:\Proj\react-table\src\styles\Login.css --- 
+ 
+--- Start of D:\Proj\react-table\src\styles\Register.css --- 
+.register-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #bde0fe;
+}
+
+.username-input,
+.password-input,
+.confirm-password-input {
+  margin: 1rem 0;
+  padding: 0.5rem;
+  font-size: 1.2rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.register-button {
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  background-color: #2196e4;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.register-button:hover {
+  background-color: #1769aa;
+}
+ 
+--- End of D:\Proj\react-table\src\styles\Register.css --- 
  

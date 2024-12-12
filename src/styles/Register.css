@@ -1,4 +1,4 @@
-.login-container {
+.register-container {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -7,7 +7,9 @@
   background-color: #bde0fe;
 }
 
-.username-input {
+.username-input,
+.password-input,
+.confirm-password-input {
   margin: 1rem 0;
   padding: 0.5rem;
   font-size: 1.2rem;
@@ -15,9 +17,8 @@
   border-radius: 5px;
 }
 
-.login-button {
+.register-button {
   padding: 0.5rem 1rem;
-  margin: 2vh 0;
   font-size: 1rem;
   background-color: #2196e4;
   color: white;
@@ -26,6 +27,6 @@
   cursor: pointer;
 }
 
-.login-button:hover {
+.register-button:hover {
   background-color: #1769aa;
 }
