@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import "../styles/ListTable.css";
 import { Button, Table } from "react-bootstrap";
@@ -13,23 +13,28 @@ const ListTable = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
 
-  useEffect(() => {
-    displayData();
-  }, []);
+  const link = "https://fakestoreapi.com/products?limit=5";
 
-  const displayData = () => {
-    axios
-      .get("https://fakestoreapi.com/products?limit=5")
-      .then((response) => {
-        setStoreData(response.data);
-        const initialCounts = response.data.reduce((acc, product) => {
+  const displayData = useMemo(() => {
+    return async () => {
+      try {
+        const response = await axios.get(link);
+        const data = response.data;
+        setStoreData(data);
+        const initialCounts = data.reduce((acc, product) => {
           acc[product.id] = 0;
           return acc;
         }, {});
         setItemCounts(initialCounts);
-      })
-      .catch((error) => console.error(error));
-  };
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+  }, [link]);
+
+  useEffect(() => {
+    displayData();
+  }, [displayData]);
 
   const handleItemCountChange = (productId, count) => {
     setItemCounts((prevCounts) => ({ ...prevCounts, [productId]: count }));

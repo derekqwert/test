@@ -19,22 +19,37 @@ import { UserProvider, UserContext } from "./contexts/UserContext";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import Store from "./components/Store";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import "./App.css";
+import ErrorBoundary from "./utils/Errorboundry";
 
 function App() {
   return (
-    <UserProvider>
-      <Router>
-        <div className="App">
-          <Routes>
-            <Route path="/" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/store" element={<ProtectedRoute><Store /></ProtectedRoute>} />
-          </Routes>
-        </div>
-      </Router>
-    </UserProvider>
+    <ErrorBoundary>
+      <UserProvider>
+        <Router>
+          <div className="App">
+            <Routes>
+              <Route path="/" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route
+                path="/store"
+                element={
+                  <ProtectedRoute>
+                    <Store />
+                  </ProtectedRoute>
+                }
+              />
+            </Routes>
+          </div>
+        </Router>
+      </UserProvider>
+    </ErrorBoundary>
   );
 }
 
@@ -48,7 +63,8 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
-export default App; 
+export default App;
+ 
 --- End of D:\Proj\react-table\src\App.js --- 
  
 --- Start of D:\Proj\react-table\src\compiled_codebase.txt --- 
@@ -73,22 +89,37 @@ import { UserProvider, UserContext } from "./contexts/UserContext";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import Store from "./components/Store";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import "./App.css";
+import ErrorBoundary from "./utils/Errorboundry";
 
 function App() {
   return (
-    <UserProvider>
-      <Router>
-        <div className="App">
-          <Routes>
-            <Route path="/" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/store" element={<ProtectedRoute><Store /></ProtectedRoute>} />
-          </Routes>
-        </div>
-      </Router>
-    </UserProvider>
+    <ErrorBoundary>
+      <UserProvider>
+        <Router>
+          <div className="App">
+            <Routes>
+              <Route path="/" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route
+                path="/store"
+                element={
+                  <ProtectedRoute>
+                    <Store />
+                  </ProtectedRoute>
+                }
+              />
+            </Routes>
+          </div>
+        </Router>
+      </UserProvider>
+    </ErrorBoundary>
   );
 }
 
@@ -102,7 +133,8 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
-export default App; 
+export default App;
+ 
 --- End of D:\Proj\react-table\src\App.js --- 
  
 --- Start of D:\Proj\react-table\src\compiled_codebase.txt --- 
@@ -116,7 +148,15 @@ export default App;
 
 .heading {
   font-family: Delius;
-  font-s 
+  font-size: 2.8em;
+  padding: 2vh 0;
+} 
+--- End of D:\Proj\react-table\src\App.css --- 
+ 
+--- Start of D:\Proj\react-table\src\App.js --- 
+import React, { useContext } from "react";
+import { UserProvider, UserContext } from "./contexts/UserContext";
+import Login from ". 
 --- End of D:\Proj\react-table\src\compiled_codebase.txt --- 
  
 --- Start of D:\Proj\react-table\src\index.css --- 
@@ -223,6 +263,11 @@ const Header = () => {
   const { username, setUsername } = useContext(UserContext);
   const navigate = useNavigate();
 
+  const throwError = () => {
+    // throw new Error("There is an error 👻☠");
+    throw ({'There is an error':'👻☠'})
+  }
+
   const handleLogout = () => {
     setUsername("");
     navigate("/");
@@ -231,9 +276,14 @@ const Header = () => {
   return (
     <div className="header-container">
       <span className="username">username: {username}</span>
-      <Button className="logout-btn" variant="danger" onClick={handleLogout}>
-        Log Out
-      </Button>
+      <div>
+        <Button className="thr-err-btn" variant="danger" onClick={throwError}>
+          Throw Error
+        </Button>
+        <Button className="logout-btn" variant="danger" onClick={handleLogout}>
+          Log Out
+        </Button>
+      </div>
     </div>
   );
 };
@@ -452,6 +502,10 @@ const Login = () => {
     }
   };
 
+  const handleSignUp = () => {
+    navigate("/register");
+  }
+
   return (
     <div className="login-container">
       <h2 className="heading">Login</h2>
@@ -471,6 +525,9 @@ const Login = () => {
       />
       <button onClick={handleLogin} className="login-button">
         Login
+      </button>
+      <button onClick={handleSignUp} className="login-button">
+        Sign Up
       </button>
     </div>
   );
@@ -583,8 +640,8 @@ export const UserProvider = ({ children }) => {
     padding: 5vh 10vw;
 }
 
-.logout-btn {
-    height: 5vh;
+.thr-err-btn {
+    margin-right: 10px;
 }
 
 .username {
@@ -641,6 +698,7 @@ export const UserProvider = ({ children }) => {
 
 .login-button {
   padding: 0.5rem 1rem;
+  margin: 2vh 0;
   font-size: 1rem;
   background-color: #2196e4;
   color: white;
@@ -690,4 +748,39 @@ export const UserProvider = ({ children }) => {
 }
  
 --- End of D:\Proj\react-table\src\styles\Register.css --- 
+ 
+--- Start of D:\Proj\react-table\src\utils\Errorboundry.js --- 
+import React from "react";
+
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: "", errorInfo: "" };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    // You can also log the error to an error reporting service
+    this.setState({ ...this.state, error: error, errorInfo: errorInfo });
+  }
+
+  render() {
+    if (this.state.hasError) {
+      // You can render any custom fallback UI
+      return (
+        <>
+          <h1>Something went wrong.</h1>
+          <br />
+          <h5>Error Details:</h5>
+          <hr />
+          <p>{this.state.errorInfo}</p>
+        </>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
+export default ErrorBoundary; 
+--- End of D:\Proj\react-table\src\utils\Errorboundry.js --- 
  
